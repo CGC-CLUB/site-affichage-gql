@@ -6,10 +6,10 @@ import type {
   LoginInput,
   ValidatePostInput,
   ValidateUserInput,
-} from "../../types";
-import prisma from "../../utils/prisma";
+} from "@/types";
+import prisma from "@/utils/prisma";
 import jwt from "jsonwebtoken";
-import useUser from "../../utils/useUser";
+import useUser from "@/utils/useUser";
 import { GraphQLError } from "graphql";
 
 export async function login({ input, req }: { input: LoginInput; req: Request }) {

@@ -1,5 +1,5 @@
 import parseToken from "./parse-token";
-import prisma from "./primsa";
+import prisma from "./prisma";
 
 export default async function useUser(req: Request) {
   const token = await req.cookieStore?.get("token");
