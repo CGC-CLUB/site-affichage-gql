@@ -1,4 +1,12 @@
-import { CreateDepartmentInput, CreatePostInput, CreateTVInput, CreateUserInput, LoginInput } from "../../types";
+import {
+  CreateDepartmentInput,
+  CreatePostInput,
+  CreateTVInput,
+  CreateUserInput,
+  LoginInput,
+  ValidatePostInput,
+  ValidateUserInput,
+} from "../../types";
 import prisma from "../../utils/prisma";
 import jwt from "jsonwebtoken";
 import useUser from "../../utils/useUser";
@@ -85,6 +93,42 @@ export async function createTV({ input, req }: { input: CreateTVInput; req: Requ
       name: input.name,
       password: input.password,
       departmentId: input.department,
+    },
+  });
+}
+
+export async function validateUser({ input, req }: { input: ValidateUserInput; req: Request }) {
+  const user = await useUser(req);
+  if (!user) {
+    return new GraphQLError("User not found");
+  }
+  if (user.role === "ADMIN" || user.role === "CHEF") {
+    return new GraphQLError("You can't validate a user with this role");
+  }
+  return prisma.user.update({
+    where: {
+      id: input.id,
+    },
+    data: {
+      validated: true,
+    },
+  });
+}
+
+export async function validatePost({ input, req }: { input: ValidatePostInput; req: Request }) {
+  const user = await useUser(req);
+  if (!user) {
+    return new GraphQLError("User not found");
+  }
+  if (user.role === "ADMIN" || user.role === "CHEF") {
+    return new GraphQLError("You can't validate a post with this role");
+  }
+  return prisma.post.update({
+    where: {
+      id: input.id,
+    },
+    data: {
+      validated: true,
     },
   });
 }

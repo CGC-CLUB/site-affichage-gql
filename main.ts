@@ -27,6 +27,7 @@ const app = new Elysia()
           updatedAt: DateTime
           posts: [Post]
           department: Department
+          validated: Boolean
         }
 
         type Post {
@@ -36,6 +37,7 @@ const app = new Elysia()
           image: String
           createdAt: DateTime
           updatedAt: DateTime
+          validated: Boolean
         }
 
         type Department {
@@ -69,6 +71,8 @@ const app = new Elysia()
           createPost(input: CreatePostInput!): Post
           createDepartment(input: CreateDepartmentInput!): Department
           createTV(input: CreateTVInput!): TV
+          validateUser(input: ValidateUserInput!): User
+          validatePost(input: ValidatePostInput!): Post
         }
 
         input CreateUserInput {
@@ -98,6 +102,14 @@ const app = new Elysia()
         input LoginInput {
           email: String!
           password: String!
+        }
+
+        input ValidateUserInput {
+          id: ID!
+        }
+
+        input ValidatePostInput {
+          id: ID!
         }
       `,
       context: {
@@ -135,6 +147,14 @@ const app = new Elysia()
           createPost: (_, args, ctx) => {
             const req = ctx.request;
             return mutations.createPost({ input: args.input as CreatePostInput, req }) as Promise<Post>;
+          },
+          validateUser: (_, args, ctx) => {
+            const req = ctx.request;
+            return mutations.validateUser({ input: args.input, req }) as Promise<User>;
+          },
+          validatePost: (_, args, ctx) => {
+            const req = ctx.request;
+            return mutations.validatePost({ input: args.input, req }) as Promise<Post>;
           },
         },
       },

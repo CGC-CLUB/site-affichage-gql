@@ -28,3 +28,11 @@ export type LoginInput = {
   email: string;
   password: string;
 };
+
+export type ValidateUserInput = {
+  id: string;
+};
+
+export type ValidatePostInput = {
+  id: string;
+};
