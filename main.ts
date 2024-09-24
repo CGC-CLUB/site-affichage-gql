@@ -1,7 +1,6 @@
 import { Elysia } from "elysia";
 import { yoga } from "@elysiajs/graphql-yoga";
 import { useCookies } from "@whatwg-node/server-plugin-cookies";
-import prisma from "./utils/primsa"; // Corrected the import name
 import * as resolvers from "./graphql/resolvers";
 import * as mutations from "./graphql/mutations";
 import { CreatePostInput, CreateUserInput } from "./types";

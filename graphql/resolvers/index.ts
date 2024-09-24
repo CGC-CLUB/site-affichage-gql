@@ -1,4 +1,4 @@
-import prisma from "../../utils/primsa";
+import prisma from "../../utils/prisma";
 
 export function getUsers() {
   return prisma.user.findMany();
