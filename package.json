@@ -3,15 +3,17 @@
   "type": "module",
   "scripts": {
     "start": "bun run main.ts",
-    "dev":"bun --hot run main.ts",
+    "dev": "bun --hot run main.ts",
     "typecheck": "tsc"
   },
   "devDependencies": {
     "@types/bun": "1",
+    "prisma": "^5.20.0",
     "typescript": "5"
   },
   "dependencies": {
     "@elysiajs/graphql-yoga": "^1.1.1",
+    "@prisma/client": "5.20.0",
     "@whatwg-node/server-plugin-cookies": "^1.0.3",
     "elysia": "1"
   }
