@@ -13,6 +13,7 @@
     "typescript": "5"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.1.1",
     "@elysiajs/graphql-yoga": "^1.1.1",
     "@prisma/client": "5.20.0",
     "@whatwg-node/server-plugin-cookies": "^1.0.3",

@@ -5,8 +5,10 @@ import * as resolvers from "@/graphql/resolvers";
 import * as mutations from "@/graphql/mutations";
 import { CreatePostInput, CreateUserInput } from "@/types";
 import { Department, Post, User } from "@prisma/client";
+import { cors } from "@elysiajs/cors";
 
 const app = new Elysia()
+  .use(cors())
   .use(
     yoga({
       typeDefs: /* GraphQL */ `
