@@ -55,11 +55,13 @@ export async function createPost({ req, input }: { input: CreatePostInput; req: 
     return new GraphQLError("User not found");
   }
 
+  const validated = user.role === "ADMIN" || user.role === "CHEF";
   return prisma.post.create({
     data: {
       content: input.content,
       image: input.image,
       authorId: user.id,
+      validated,
     },
   });
 }
