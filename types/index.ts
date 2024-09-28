@@ -36,3 +36,18 @@ export type ValidateUserInput = {
 export type ValidatePostInput = {
   id: string;
 };
+
+export type UserFilterInput = {
+  id?: string;
+  email?: string;
+  first_name?: string;
+  family_name?: string;
+  validated?: boolean;
+  role?: Role;
+};
+
+export type PostFilterInput = {
+  id?: string;
+  validated?: boolean;
+  content?: string;
+};
