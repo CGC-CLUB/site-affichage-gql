@@ -1,29 +1,9 @@
 import { PostFilterInput, UserFilterInput } from "@/types";
 import prisma from "@/utils/prisma";
+import Filter from "@/utils/filter";
 
 export function getUsers(filter?: UserFilterInput) {
-  const where: UserFilterInput = {};
-  if (filter) {
-    console.log(filter);
-    if (filter.id) {
-      where.id = filter.id;
-    }
-    if (filter.email) {
-      where.email = filter.email;
-    }
-    if (filter.first_name) {
-      where.first_name = filter.first_name;
-    }
-    if (filter.family_name) {
-      where.family_name = filter.family_name;
-    }
-    if (typeof filter.validated === "boolean") {
-      where.validated = filter.validated;
-    }
-    if (filter.role) {
-      where.role = filter.role;
-    }
-  }
+  const where = Filter<UserFilterInput>(filter);
   return prisma.user.findMany({
     where,
     include: {
@@ -46,18 +26,7 @@ export function getUser(id: string) {
 }
 
 export function getPosts(filter?: PostFilterInput) {
-  const where: PostFilterInput = {};
-  if (filter) {
-    if (filter.id) {
-      where.id = filter.id;
-    }
-    if (typeof filter.validated === "boolean") {
-      where.validated = filter.validated;
-    }
-    if (filter.content) {
-      where.content = filter.content;
-    }
-  }
+  const where = Filter<PostFilterInput>(filter);
   return prisma.post.findMany({
     where,
     include: {
