@@ -27,6 +27,7 @@ export const schema = /* GraphQL */ `
     createdAt: DateTime
     updatedAt: DateTime
     validated: Boolean
+    department: Department
   }
 
   type Department {
@@ -34,6 +35,9 @@ export const schema = /* GraphQL */ `
     name: String
     chef: User
     TVs: [TV]
+    posts: [Post]
+    createdAt: DateTime
+    updatedAt: DateTime
   }
 
   type TV {

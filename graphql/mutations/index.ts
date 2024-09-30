@@ -122,7 +122,7 @@ export async function validatePost({ input, req }: { input: ValidatePostInput; r
   if (!user) {
     return new GraphQLError("User not found");
   }
-  if (user.role === "ADMIN" || user.role === "CHEF") {
+  if (user.role === "USER" || user.role === "ADMIN") {
     return new GraphQLError("You can't validate a post with this role");
   }
   return prisma.post.update({

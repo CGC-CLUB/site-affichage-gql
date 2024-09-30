@@ -35,14 +35,16 @@ model User {
 }
 
 model Post {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  content   String?
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  String   @db.ObjectId
-  image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  validated Boolean  @default(false)
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  content      String?
+  author       User       @relation(fields: [authorId], references: [id])
+  authorId     String     @db.ObjectId
+  image        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  validated    Boolean    @default(false)
+  department   Department @relation(fields: [departmentId], references: [id])
+  departmentId String     @db.ObjectId
 }
 
 model Department {
@@ -53,6 +55,7 @@ model Department {
   TVs       TVs[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Post      Post[]
 }
 
 model TVs {

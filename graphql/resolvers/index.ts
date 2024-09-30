@@ -31,6 +31,7 @@ export function getPosts(filter?: PostFilterInput) {
     where,
     include: {
       author: true,
+      department: true,
     },
   });
 }
@@ -42,6 +43,7 @@ export function getPost(id: string) {
     },
     include: {
       author: true,
+      department: true,
     },
   });
 }
@@ -51,6 +53,7 @@ export function getDepartments() {
     include: {
       TVs: true,
       chef: true,
+      Post: true,
     },
   });
 }
@@ -63,6 +66,7 @@ export function getDepartment(id: string) {
     include: {
       TVs: true,
       chef: true,
+      Post: true,
     },
   });
 }
