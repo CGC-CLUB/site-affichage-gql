@@ -94,6 +94,7 @@ export const schema = /* GraphQL */ `
   input CreatePostInput {
     content: String
     image: String
+    departmentId: String!
   }
 
   input CreateDepartmentInput {

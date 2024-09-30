@@ -61,6 +61,7 @@ export async function createPost({ req, input }: { input: CreatePostInput; req: 
       content: input.content,
       image: input.image,
       authorId: user.id,
+      departmentId: input.departmentId,
       validated,
     },
   });

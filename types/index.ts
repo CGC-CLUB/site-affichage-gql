@@ -11,6 +11,7 @@ export type CreateUserInput = {
 export type CreatePostInput = {
   content: string;
   image: string;
+  departmentId: string;
 };
 
 export type CreateDepartmentInput = {
