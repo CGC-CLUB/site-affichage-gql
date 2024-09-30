@@ -27,6 +27,10 @@ const app = new Elysia()
           department: (_, args) => resolvers.getDepartment(args.id),
           TVs: () => resolvers.getTVs(),
           TV: (_, args) => resolvers.getTV(args.id),
+          me: (_, _args, ctx) => {
+            const req = ctx.request;
+            return resolvers.me(req) as Promise<User>;
+          },
         },
         Mutation: {
           login: (_, args, ctx) => {
@@ -62,6 +66,7 @@ const app = new Elysia()
       plugins: [useCookies()],
     })
   )
+
   .listen(3000);
 
 console.log("🎉 Listening on http://localhost:3000");

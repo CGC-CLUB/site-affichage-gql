@@ -1,6 +1,8 @@
 import { PostFilterInput, UserFilterInput } from "@/types";
 import prisma from "@/utils/prisma";
 import Filter from "@/utils/filter";
+import useUser from "@/utils/useUser";
+import { GraphQLError } from "graphql";
 
 export function getUsers(filter?: UserFilterInput) {
   const where = Filter<UserFilterInput>(filter);
@@ -88,4 +90,14 @@ export function getTV(id: string) {
       Department: true,
     },
   });
+}
+
+export async function me(req: Request) {
+  const user = await useUser(req);
+  const token = await req.cookieStore?.get("token");
+  if (!user) {
+    return new GraphQLError("You must be logged in to access this field");
+  }
+  console.log(user);
+  return user;
 }

@@ -56,6 +56,7 @@ export const schema = /* GraphQL */ `
     department(id: ID!): Department
     TVs: [TV]
     TV(id: ID!): TV
+    me: User
   }
 
   type Mutation {
