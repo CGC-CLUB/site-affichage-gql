@@ -8,10 +8,6 @@ export function getUsers(filter?: UserFilterInput) {
   const where = Filter<UserFilterInput>(filter);
   return prisma.user.findMany({
     where,
-    include: {
-      Post: true,
-      Department: true,
-    },
   });
 }
 
@@ -20,10 +16,6 @@ export function getUser(id: string) {
     where: {
       id: id,
     },
-    include: {
-      Post: true,
-      Department: true,
-    },
   });
 }
 
@@ -31,10 +23,6 @@ export function getPosts(filter?: PostFilterInput) {
   const where = Filter<PostFilterInput>(filter);
   return prisma.post.findMany({
     where,
-    include: {
-      author: true,
-      department: true,
-    },
   });
 }
 
@@ -43,21 +31,11 @@ export function getPost(id: string) {
     where: {
       id: id,
     },
-    include: {
-      author: true,
-      department: true,
-    },
   });
 }
 
 export function getDepartments() {
-  return prisma.department.findMany({
-    include: {
-      TVs: true,
-      chef: true,
-      Post: true,
-    },
-  });
+  return prisma.department.findMany({});
 }
 
 export function getDepartment(id: string) {
@@ -65,29 +43,17 @@ export function getDepartment(id: string) {
     where: {
       id: id,
     },
-    include: {
-      TVs: true,
-      chef: true,
-      Post: true,
-    },
   });
 }
 
 export function getTVs() {
-  return prisma.tVs.findMany({
-    include: {
-      Department: true,
-    },
-  });
+  return prisma.tVs.findMany({});
 }
 
 export function getTV(id: string) {
   return prisma.tVs.findUnique({
     where: {
       id: id,
-    },
-    include: {
-      Department: true,
     },
   });
 }

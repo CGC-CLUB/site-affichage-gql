@@ -7,6 +7,7 @@ import { CreatePostInput, CreateUserInput, PostFilterInput, UserFilterInput } fr
 import { Department, Post, User } from "@prisma/client";
 import { cors } from "@elysiajs/cors";
 import { schema } from "./graphql/schema";
+import prisma from "./utils/prisma";
 
 const app = new Elysia()
   .use(cors())
@@ -61,6 +62,35 @@ const app = new Elysia()
             const req = ctx.request;
             return mutations.validatePost({ input: args.input, req }) as Promise<Post>;
           },
+        },
+        Department: {
+          /*
+           * why i'm i getting this error:
+           * cuz the return type of the resolver is a promise + the type are not the same exactly (prisma got additional fields)
+           * so i'm just ignoring them
+           */
+          // @ts-ignore
+          chef: (parent) => prisma.user.findUnique({ where: { id: parent.chefId } }),
+          // @ts-ignore
+          TVs: (parent) => prisma.tVs.findMany({ where: { departmentId: parent.id } }),
+          // @ts-ignore
+          posts: (parent) => prisma.post.findMany({ where: { departmentId: parent.id } }),
+        },
+        User: {
+          // @ts-ignore
+          posts: (parent) => prisma.post.findMany({ where: { authorId: parent.id } }),
+          // @ts-ignore
+          department: (parent) => prisma.department.findUnique({ where: { id: parent.departmentId } }),
+        },
+        Post: {
+          // @ts-ignore
+          author: (parent) => prisma.user.findUnique({ where: { id: parent.authorId } }),
+          // @ts-ignore
+          department: (parent) => prisma.department.findUnique({ where: { id: parent.departmentId } }),
+        },
+        TV: {
+          // @ts-ignore
+          department: (parent) => prisma.department.findUnique({ where: { id: parent.departmentId } }),
         },
       },
       plugins: [useCookies()],
