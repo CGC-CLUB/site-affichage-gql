@@ -73,6 +73,7 @@ export const schema = /* GraphQL */ `
     id: ID
     validated: Boolean
     content: String
+    departmentId: ID
   }
 
   input UserFilterInput {

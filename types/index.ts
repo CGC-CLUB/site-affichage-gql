@@ -51,4 +51,5 @@ export type PostFilterInput = {
   id?: string;
   validated?: boolean;
   content?: string;
+  departmentId?: string;
 };
