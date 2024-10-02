@@ -53,3 +53,8 @@ export type PostFilterInput = {
   content?: string;
   departmentId?: string;
 };
+
+export type LoginTvInput = {
+  name: string;
+  password: string;
+};

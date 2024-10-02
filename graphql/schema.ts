@@ -67,6 +67,7 @@ export const schema = /* GraphQL */ `
     createTV(input: CreateTVInput!): TV
     validateUser(input: ValidateUserInput!): User
     validatePost(input: ValidatePostInput!): Post
+    loginTv(input: LoginTvInput!): TV
   }
 
   input PostFilterInput {
@@ -83,6 +84,10 @@ export const schema = /* GraphQL */ `
     family_name: String
     validated: Boolean
     role: Role
+  }
+  input LoginTvInput {
+    name: String!
+    password: String!
   }
 
   input CreateUserInput {

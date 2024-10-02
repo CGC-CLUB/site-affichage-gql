@@ -62,6 +62,10 @@ const app = new Elysia()
             const req = ctx.request;
             return mutations.validatePost({ input: args.input, req }) as Promise<Post>;
           },
+          loginTv(_parent, args, ctx) {
+            const req = ctx.request;
+            return mutations.loginTv({ input: args.input, req });
+          },
         },
         Department: {
           /*

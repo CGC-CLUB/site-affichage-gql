@@ -4,6 +4,7 @@ import type {
   CreateTVInput,
   CreateUserInput,
   LoginInput,
+  LoginTvInput,
   ValidatePostInput,
   ValidateUserInput,
 } from "@/types";
@@ -134,4 +135,14 @@ export async function validatePost({ input, req }: { input: ValidatePostInput; r
       validated: true,
     },
   });
+}
+
+export async function loginTv({ input, req }: { input: LoginTvInput; req: Request }) {
+  const tv = await prisma.tVs.findMany();
+  const t = tv.find((t) => t.name === input.name && t.password === input.password);
+  if (!t) {
+    return new GraphQLError("TV not found");
+  }
+  req.cookieStore?.set("token", jwt.sign({ tvId: t?.id }, process.env.JWT_SECRET as string));
+  return t;
 }
