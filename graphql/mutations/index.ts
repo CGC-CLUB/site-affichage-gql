@@ -36,7 +36,7 @@ export async function createUser({ input, req }: { input: CreateUserInput; req: 
     return new GraphQLError("User not found");
   }
 
-  if (user.role === "ADMIN" || user.role === "CHEF") {
+  if (user.role === "USER") {
     return new GraphQLError("You can't create a user with this role");
   }
   return await prisma.user.create({
