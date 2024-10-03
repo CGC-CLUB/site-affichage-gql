@@ -26,12 +26,15 @@ export function getPosts(filter?: PostFilterInput) {
   });
 }
 
-export function getPost(id: string) {
-  return prisma.post.findUnique({
+export async function getPost(id: string) {
+  console.log(id);
+  const post = await prisma.post.findUnique({
     where: {
-      id: id,
+      id,
     },
   });
+  console.log(post);
+  return post;
 }
 
 export function getDepartments() {

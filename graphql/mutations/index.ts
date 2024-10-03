@@ -56,7 +56,7 @@ export async function createPost({ req, input }: { input: CreatePostInput; req: 
     return new GraphQLError("User not found");
   }
 
-  const validated = user.role === "ADMIN" || user.role === "CHEF";
+  const validated = user.role === "USER" ? false : true;
   return prisma.post.create({
     data: {
       content: input.content,
@@ -106,7 +106,7 @@ export async function validateUser({ input, req }: { input: ValidateUserInput; r
   if (!user) {
     return new GraphQLError("User not found");
   }
-  if (user.role === "ADMIN" || user.role === "CHEF") {
+  if (user.role === "USER") {
     return new GraphQLError("You can't validate a user with this role");
   }
   return prisma.user.update({
@@ -124,7 +124,7 @@ export async function validatePost({ input, req }: { input: ValidatePostInput; r
   if (!user) {
     return new GraphQLError("User not found");
   }
-  if (user.role === "USER" || user.role === "ADMIN") {
+  if (user.role === "USER") {
     return new GraphQLError("You can't validate a post with this role");
   }
   return prisma.post.update({
