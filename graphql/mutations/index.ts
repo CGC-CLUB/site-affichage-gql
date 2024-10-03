@@ -146,3 +146,44 @@ export async function loginTv({ input, req }: { input: LoginTvInput; req: Reques
   req.cookieStore?.set("token", jwt.sign({ tvId: t?.id }, process.env.JWT_SECRET as string));
   return t;
 }
+
+export async function logout({ req }: { req: Request }) {
+  await req.cookieStore?.set("token", "");
+  return "ok";
+}
+
+export async function invalidatePost({ input, req }: { input: ValidatePostInput; req: Request }) {
+  const user = await useUser(req);
+  if (!user) {
+    return new GraphQLError("User not found");
+  }
+  if (user.role === "USER") {
+    return new GraphQLError("You can't invalidate a post with this role");
+  }
+  return prisma.post.update({
+    where: {
+      id: input.id,
+    },
+    data: {
+      validated: false,
+    },
+  });
+}
+
+export async function invalidateUser({ input, req }: { input: ValidateUserInput; req: Request }) {
+  const user = await useUser(req);
+  if (!user) {
+    return new GraphQLError("User not found");
+  }
+  if (user.role === "USER") {
+    return new GraphQLError("You can't invalidate a user with this role");
+  }
+  return prisma.user.update({
+    where: {
+      id: input.id,
+    },
+    data: {
+      validated: false,
+    },
+  });
+}

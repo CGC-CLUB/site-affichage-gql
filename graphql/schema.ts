@@ -68,6 +68,9 @@ export const schema = /* GraphQL */ `
     validateUser(input: ValidateUserInput!): User
     validatePost(input: ValidatePostInput!): Post
     loginTv(input: LoginTvInput!): TV
+    logout: String
+    invalidatePost(input: ValidatePostInput!): Post
+    invalidateUser(input: ValidateUserInput!): User
   }
 
   input PostFilterInput {
