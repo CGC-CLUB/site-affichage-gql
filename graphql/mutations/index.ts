@@ -148,7 +148,7 @@ export async function loginTv({ input, req }: { input: LoginTvInput; req: Reques
 }
 
 export async function logout({ req }: { req: Request }) {
-  await req.cookieStore?.set("token", "");
+  await req.cookieStore?.delete("token");
   return "ok";
 }
 
