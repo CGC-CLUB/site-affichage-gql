@@ -12,6 +12,7 @@ import prisma from "@/utils/prisma";
 import jwt from "jsonwebtoken";
 import useUser from "@/utils/useUser";
 import { GraphQLError } from "graphql";
+import { User } from "@/prisma/drizzle/schema";
 
 export async function login({ input, req }: { input: LoginInput; req: Request }) {
   const user = await prisma.user.findUnique({

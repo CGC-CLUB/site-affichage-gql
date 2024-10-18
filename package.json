@@ -9,6 +9,8 @@
   "devDependencies": {
     "@types/bun": "1",
     "@types/jsonwebtoken": "^9.0.7",
+    "drizzle-kit": "^0.26.2",
+    "drizzle-prisma-generator": "^0.1.7",
     "prisma": "^5.20.0",
     "typescript": "5"
   },
@@ -17,6 +19,7 @@
     "@elysiajs/graphql-yoga": "^1.1.1",
     "@prisma/client": "5.20.0",
     "@whatwg-node/server-plugin-cookies": "^1.0.3",
+    "drizzle-orm": "^0.35.2",
     "elysia": "1",
     "graphql": "^16.9.0",
     "jsonwebtoken": "^9.0.2"

@@ -3,62 +3,61 @@ import prisma from "@/utils/prisma";
 import Filter from "@/utils/filter";
 import useUser from "@/utils/useUser";
 import { GraphQLError } from "graphql";
+import { Department, Post, TVs, User } from "@/prisma/drizzle/schema";
+import { and, eq, type SQL } from "drizzle-orm";
 
 export function getUsers(filter?: UserFilterInput) {
-  const where = Filter<UserFilterInput>(filter);
-  return prisma.user.findMany({
-    where,
-  });
+  const filters: SQL[] = [];
+  if (filter?.email) filters.push(eq(User.email, filter.email));
+  if (filter?.first_name) filters.push(eq(User.first_name, filter.first_name));
+  if (filter?.family_name) filters.push(eq(User.family_name, filter.family_name));
+  if (filter?.validated) filters.push(eq(User.validated, filter.validated));
+  if (filter?.role) filters.push(eq(User.role, filter.role));
+  if (filter?.id) filters.push(eq(User.id, filter.id));
+
+  return prisma.$drizzle
+    .select()
+    .from(User)
+    .where(and(...filters));
 }
 
 export function getUser(id: string) {
-  return prisma.user.findUnique({
-    where: {
-      id: id,
-    },
-  });
+  return prisma.$drizzle.select().from(User).where(eq(User.id, id));
 }
 
 export function getPosts(filter?: PostFilterInput) {
-  const where = Filter<PostFilterInput>(filter);
-  return prisma.post.findMany({
-    where,
-  });
+  const filters: SQL[] = [];
+  if (filter?.id) filters.push(eq(Post.id, filter.id));
+  if (filter?.validated) filters.push(eq(Post.validated, filter.validated));
+  if (filter?.content) filters.push(eq(Post.content, filter.content));
+  if (filter?.departmentId) filters.push(eq(Post.departmentId, filter.departmentId));
+  if (filter?.authorId) filters.push(eq(Post.authorId, filter.authorId));
+  return prisma.$drizzle
+    .select()
+    .from(Post)
+    .where(and(...filters));
 }
 
 export async function getPost(id: string) {
-  console.log(id);
-  const post = await prisma.post.findUnique({
-    where: {
-      id,
-    },
-  });
-  console.log(post);
-  return post;
+  return prisma.$drizzle.select().from(Post).where(eq(Post.id, id));
 }
 
 export function getDepartments() {
-  return prisma.department.findMany({});
+  return prisma.$drizzle.select().from(Department);
 }
 
-export function getDepartment(id: string) {
-  return prisma.department.findUnique({
-    where: {
-      id: id,
-    },
-  });
+export async function getDepartment(id: string) {
+  const department = await prisma.$drizzle.select().from(Department).where(eq(Department.id, id));
+  console.log(department);
+  return department;
 }
 
 export function getTVs() {
-  return prisma.tVs.findMany({});
+  return prisma.$drizzle.select().from(TVs);
 }
 
 export function getTV(id: string) {
-  return prisma.tVs.findUnique({
-    where: {
-      id: id,
-    },
-  });
+  return prisma.$drizzle.select().from(TVs).where(eq(TVs.id, id));
 }
 
 export async function me(req: Request) {

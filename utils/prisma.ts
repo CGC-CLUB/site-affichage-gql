@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client";
+import { drizzle } from 'drizzle-orm/prisma/pg';
 
 const prismaClientSingleton = () => {
-  return new PrismaClient();
+  return new PrismaClient().$extends(drizzle());
 };
 
 declare const globalThis: {
