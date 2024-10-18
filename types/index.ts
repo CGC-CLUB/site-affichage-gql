@@ -52,6 +52,7 @@ export type PostFilterInput = {
   validated?: boolean;
   content?: string;
   departmentId?: string;
+  authorId?: string;
 };
 
 export type LoginTvInput = {

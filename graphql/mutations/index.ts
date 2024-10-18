@@ -157,17 +157,22 @@ export async function invalidatePost({ input, req }: { input: ValidatePostInput;
   if (!user) {
     return new GraphQLError("User not found");
   }
-  if (user.role === "USER") {
+  const post = await prisma.post.findUnique({ where: { id: input.id } });
+  if (!post) {
+    return new GraphQLError("Post Not Found");
+  }
+  if (user.id === post.authorId) {
+    return prisma.post.update({
+      where: {
+        id: input.id,
+      },
+      data: {
+        validated: false,
+      },
+    });
+  } else {
     return new GraphQLError("You can't invalidate a post with this role");
   }
-  return prisma.post.update({
-    where: {
-      id: input.id,
-    },
-    data: {
-      validated: false,
-    },
-  });
 }
 
 export async function invalidateUser({ input, req }: { input: ValidateUserInput; req: Request }) {

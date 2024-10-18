@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -20,14 +20,14 @@ enum Role {
 }
 
 model User {
-  id           String       @id @default(auto()) @map("_id") @db.ObjectId
+  id           String       @id @default(uuid())
   email        String       @unique
   family_name  String
   first_name   String
   password     String
   role         Role         @default(USER)
   Post         Post[]
-  departmentId String?      @db.ObjectId
+  departmentId String?
   Department   Department[]
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
@@ -35,23 +35,23 @@ model User {
 }
 
 model Post {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  id           String     @id @default(uuid())
   content      String?
   author       User       @relation(fields: [authorId], references: [id])
-  authorId     String     @db.ObjectId
+  authorId     String
   image        String?
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   validated    Boolean    @default(false)
   department   Department @relation(fields: [departmentId], references: [id])
-  departmentId String     @db.ObjectId
+  departmentId String
 }
 
 model Department {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  id        String   @id @default(uuid())
   name      String
   chef      User     @relation(references: [id], fields: [chefId])
-  chefId    String   @db.ObjectId
+  chefId    String
   TVs       TVs[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -59,9 +59,9 @@ model Department {
 }
 
 model TVs {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  id           String     @id @default(uuid())
   name         String
-  departmentId String     @db.ObjectId
+  departmentId String
   Department   Department @relation(fields: [departmentId], references: [id])
   password     String
   createdAt    DateTime   @default(now())
