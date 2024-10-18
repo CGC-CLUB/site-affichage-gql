@@ -50,6 +50,7 @@ model Post {
   validated    Boolean    @default(false)
   department   Department @relation(fields: [departmentId], references: [id])
   departmentId String
+  important    Boolean    @default(false)
 }
 
 model Department {

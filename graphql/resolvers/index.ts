@@ -5,6 +5,7 @@ import useUser from "@/utils/useUser";
 import { GraphQLError } from "graphql";
 import { Department, Post, TVs, User } from "@/prisma/drizzle/schema";
 import { and, eq, type SQL } from "drizzle-orm";
+import { Role } from "@prisma/client";
 
 export function getUsers(filter?: UserFilterInput) {
   const filters: SQL[] = [];
@@ -25,17 +26,19 @@ export function getUser(id: string) {
   return prisma.$drizzle.select().from(User).where(eq(User.id, id));
 }
 
-export function getPosts(filter?: PostFilterInput) {
+export async function getPosts(filter?: PostFilterInput) {
   const filters: SQL[] = [];
   if (filter?.id) filters.push(eq(Post.id, filter.id));
   if (filter?.validated) filters.push(eq(Post.validated, filter.validated));
   if (filter?.content) filters.push(eq(Post.content, filter.content));
   if (filter?.departmentId) filters.push(eq(Post.departmentId, filter.departmentId));
   if (filter?.authorId) filters.push(eq(Post.authorId, filter.authorId));
-  return prisma.$drizzle
+  const primaryPosts = await prisma.$drizzle
     .select()
     .from(Post)
     .where(and(...filters));
+  const adminPosts = await prisma.$drizzle.select().from(Post).where(eq(Post.important, true));
+  return [...adminPosts, ...primaryPosts];
 }
 
 export async function getPost(id: string) {

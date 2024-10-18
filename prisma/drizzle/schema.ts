@@ -24,7 +24,8 @@ export const Post = pgTable('Post', {
 	createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow(),
 	updatedAt: timestamp('updatedAt', { precision: 3 }).notNull(),
 	validated: boolean('validated').notNull(),
-	departmentId: text('departmentId').notNull()
+	departmentId: text('departmentId').notNull(),
+	important: boolean('important').notNull()
 }, (Post) => ({
 	'Post_author_fkey': foreignKey({
 		name: 'Post_author_fkey',

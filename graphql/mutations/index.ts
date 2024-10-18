@@ -57,7 +57,8 @@ export async function createPost({ req, input }: { input: CreatePostInput; req: 
     return new GraphQLError("User not found");
   }
 
-  const validated = user.role === "USER" ? false : true;
+  const validated = user.role !== "USER";
+  const important = user.role === "ADMIN";
   return prisma.post.create({
     data: {
       content: input.content,
@@ -65,6 +66,7 @@ export async function createPost({ req, input }: { input: CreatePostInput; req: 
       authorId: user.id,
       departmentId: input.departmentId,
       validated,
+      important,
     },
   });
 }
