@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1729284910860,
+      "tag": "0000_keen_carnage",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1729285862535,
+      "tag": "0001_parallel_stone_men",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1729286182413,
+      "tag": "0002_mute_squadron_supreme",
+      "breakpoints": true
+    }
+  ]
+}

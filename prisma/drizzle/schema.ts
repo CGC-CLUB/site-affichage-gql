@@ -12,7 +12,6 @@ export const User = pgTable('User', {
 	role: Role('role').notNull().default("USER"),
 	departmentId: text('departmentId'),
 	createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow(),
-	updatedAt: timestamp('updatedAt', { precision: 3 }).notNull(),
 	validated: boolean('validated').notNull()
 });
 
@@ -22,7 +21,6 @@ export const Post = pgTable('Post', {
 	authorId: text('authorId').notNull(),
 	image: text('image'),
 	createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow(),
-	updatedAt: timestamp('updatedAt', { precision: 3 }).notNull(),
 	validated: boolean('validated').notNull(),
 	departmentId: text('departmentId').notNull(),
 	important: boolean('important').notNull()
@@ -47,8 +45,7 @@ export const Department = pgTable('Department', {
 	id: text('id').notNull().primaryKey().default(sql`uuid()`),
 	name: text('name').notNull(),
 	chefId: text('chefId').notNull(),
-	createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow(),
-	updatedAt: timestamp('updatedAt', { precision: 3 }).notNull()
+	createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow()
 }, (Department) => ({
 	'Department_chef_fkey': foreignKey({
 		name: 'Department_chef_fkey',
@@ -64,8 +61,7 @@ export const TVs = pgTable('TVs', {
 	name: text('name').notNull(),
 	departmentId: text('departmentId').notNull(),
 	password: text('password').notNull(),
-	createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow(),
-	updatedAt: timestamp('updatedAt', { precision: 3 }).notNull()
+	createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow()
 }, (TVs) => ({
 	'TVs_Department_fkey': foreignKey({
 		name: 'TVs_Department_fkey',

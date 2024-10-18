@@ -1,11 +1,9 @@
 import { PostFilterInput, UserFilterInput } from "@/types";
-import prisma from "@/utils/prisma";
-import Filter from "@/utils/filter";
 import useUser from "@/utils/useUser";
 import { GraphQLError } from "graphql";
 import { Department, Post, TVs, User } from "@/prisma/drizzle/schema";
 import { and, eq, type SQL } from "drizzle-orm";
-import { Role } from "@prisma/client";
+import { db } from "@/prisma/db";
 
 export function getUsers(filter?: UserFilterInput) {
   const filters: SQL[] = [];
@@ -16,14 +14,14 @@ export function getUsers(filter?: UserFilterInput) {
   if (filter?.role) filters.push(eq(User.role, filter.role));
   if (filter?.id) filters.push(eq(User.id, filter.id));
 
-  return prisma.$drizzle
+  return db
     .select()
     .from(User)
     .where(and(...filters));
 }
 
 export function getUser(id: string) {
-  return prisma.$drizzle.select().from(User).where(eq(User.id, id));
+  return db.select().from(User).where(eq(User.id, id));
 }
 
 export async function getPosts(filter?: PostFilterInput) {
@@ -33,34 +31,34 @@ export async function getPosts(filter?: PostFilterInput) {
   if (filter?.content) filters.push(eq(Post.content, filter.content));
   if (filter?.departmentId) filters.push(eq(Post.departmentId, filter.departmentId));
   if (filter?.authorId) filters.push(eq(Post.authorId, filter.authorId));
-  const primaryPosts = await prisma.$drizzle
+  const primaryPosts = await db
     .select()
     .from(Post)
     .where(and(...filters));
-  const adminPosts = await prisma.$drizzle.select().from(Post).where(eq(Post.important, true));
+  const adminPosts = await db.select().from(Post).where(eq(Post.important, true));
   return [...adminPosts, ...primaryPosts];
 }
 
 export async function getPost(id: string) {
-  return prisma.$drizzle.select().from(Post).where(eq(Post.id, id));
+  return db.select().from(Post).where(eq(Post.id, id));
 }
 
 export function getDepartments() {
-  return prisma.$drizzle.select().from(Department);
+  return db.select().from(Department);
 }
 
 export async function getDepartment(id: string) {
-  const department = await prisma.$drizzle.select().from(Department).where(eq(Department.id, id));
+  const department = await db.select().from(Department).where(eq(Department.id, id));
   console.log(department);
   return department;
 }
 
 export function getTVs() {
-  return prisma.$drizzle.select().from(TVs);
+  return db.select().from(TVs);
 }
 
 export function getTV(id: string) {
-  return prisma.$drizzle.select().from(TVs).where(eq(TVs.id, id));
+  return db.select().from(TVs).where(eq(TVs.id, id));
 }
 
 export async function me(req: Request) {

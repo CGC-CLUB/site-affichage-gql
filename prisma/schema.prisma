@@ -35,7 +35,6 @@ model User {
   departmentId String?
   Department   Department[]
   createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
   validated    Boolean      @default(false)
 }
 
@@ -46,7 +45,6 @@ model Post {
   authorId     String
   image        String?
   createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
   validated    Boolean    @default(false)
   department   Department @relation(fields: [departmentId], references: [id])
   departmentId String
@@ -60,7 +58,6 @@ model Department {
   chefId    String
   TVs       TVs[]
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
   Post      Post[]
 }
 
@@ -71,5 +68,4 @@ model TVs {
   Department   Department @relation(fields: [departmentId], references: [id])
   password     String
   createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
 }
