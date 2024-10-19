@@ -45,7 +45,7 @@ export async function getPosts(filter?: PostFilterInput) {
     const primaryPosts = await db
       .select()
       .from(Post)
-      .where(and(...filters));
+      .where(and(...filters, eq(Post.important, false)));
     const adminPosts = await db.select().from(Post).where(eq(Post.important, true));
     return [...adminPosts, ...primaryPosts];
   } catch (error) {

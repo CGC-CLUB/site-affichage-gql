@@ -184,10 +184,15 @@ export async function validatePost({ input, req }: { input: ValidatePostInput; r
       return new GraphQLError("You can't validate a post with this role");
     }
 
-    const postToUpdate = await db.select().from(Post).where(eq(Post.id, input.id));
-    if (postToUpdate.length === 0) {
+    const postToUpdate = (await db.select().from(Post).where(eq(Post.id, input.id))).at(0);
+    if (postToUpdate?.important === true && user.role !== "ADMIN") {
+      return new GraphQLError("You can't validate an important post");
+    }
+
+    if (!postToUpdate) {
       return new GraphQLError("Post not found");
     }
+
     const updatedPost = await db.update(Post).set({ validated: true }).where(eq(Post.id, input.id)).returning();
     return updatedPost.at(0);
   } catch (error) {
@@ -232,16 +237,18 @@ export async function invalidatePost({ input, req }: { input: ValidatePostInput;
     if (!post) {
       return new GraphQLError("Post Not Found");
     }
-    if (user.id === post.authorId) {
-      const postToUpdate = await db.select().from(Post).where(eq(Post.id, input.id));
-      if (postToUpdate.length === 0) {
-        return new GraphQLError("Post not found");
-      }
-      const updatedPost = await db.update(Post).set({ validated: false }).where(eq(Post.id, input.id)).returning();
-      return updatedPost.at(0);
-    } else {
+    if (user.id !== post.authorId) {
       return new GraphQLError("You can't invalidate a post with this role");
     }
+
+    if (post.important === true && user.role !== "ADMIN") {
+      return new GraphQLError("You can't invalidate an important post");
+    }
+    if (!post) {
+      return new GraphQLError("Post not found");
+    }
+    const updatedPost = await db.update(Post).set({ validated: false }).where(eq(Post.id, input.id)).returning();
+    return updatedPost.at(0);
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
