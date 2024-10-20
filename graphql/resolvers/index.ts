@@ -2,7 +2,7 @@ import { PostFilterInput, UserFilterInput } from "@/types";
 import useUser from "@/utils/useUser";
 import { GraphQLError } from "graphql";
 import { Department, Post, TVs, User } from "@/prisma/drizzle/schema";
-import { and, eq, sql, type SQL } from "drizzle-orm";
+import { and, eq, sql, type SQL, gte } from "drizzle-orm";
 import { db } from "@/prisma/db";
 
 export function getUsers(filter?: UserFilterInput) {
@@ -47,13 +47,13 @@ export async function getPosts(filter?: PostFilterInput) {
     const primaryPosts = await db
       .select()
       .from(Post)
-      .where(and(...filters, eq(Post.important, false), eq(Post.createdAt, sevenDaysAgo)));
+      .where(and(...filters, eq(Post.important, false), gte(Post.createdAt, sevenDaysAgo)));
 
     const adminPosts = await db
       .select()
       .from(Post)
-      .where(and(eq(Post.important, true), eq(Post.createdAt, sevenDaysAgo)));
-
+      .where(and(eq(Post.important, true), gte(Post.createdAt, sevenDaysAgo)));
+    console.log([...adminPosts, ...primaryPosts]);
     return [...adminPosts, ...primaryPosts];
   } catch (error) {
     if (error instanceof Error) return new GraphQLError(error.message);
