@@ -28,6 +28,7 @@ export const schema = /* GraphQL */ `
     updatedAt: DateTime
     validated: Boolean
     department: Department
+    important: Boolean
   }
 
   type Department {
@@ -78,7 +79,7 @@ export const schema = /* GraphQL */ `
     validated: Boolean
     content: String
     departmentId: ID
-    authorId:ID
+    authorId: ID
   }
 
   input UserFilterInput {
