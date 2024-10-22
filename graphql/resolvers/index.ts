@@ -39,10 +39,16 @@ export async function getPosts(filter?: PostFilterInput) {
     const filters: SQL[] = [];
     const sevenDaysAgo = sql`NOW() - INTERVAL '7 days'`;
     if (filter?.id) filters.push(eq(Post.id, filter.id));
-    if (filter?.validated) filters.push(eq(Post.validated, filter.validated));
+    if (typeof filter?.validated === "boolean") filters.push(eq(Post.validated, filter.validated));
     if (filter?.content) filters.push(eq(Post.content, filter.content));
     if (filter?.departmentId) filters.push(eq(Post.departmentId, filter.departmentId));
     if (filter?.authorId) filters.push(eq(Post.authorId, filter.authorId));
+    if (filter?.chefId) {
+      const department = (await db.select().from(Department).where(eq(Department.id, filter.chefId))).at(0);
+      if (department) {
+        filters.push(eq(Post.departmentId, department.id));
+      }
+    }
 
     const primaryPosts = await db
       .select()

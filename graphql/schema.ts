@@ -80,6 +80,7 @@ export const schema = /* GraphQL */ `
     content: String
     departmentId: ID
     authorId: ID
+    chefId:ID
   }
 
   input UserFilterInput {
