@@ -1,28 +1,26 @@
 import { relations, sql } from 'drizzle-orm'
-import { boolean, foreignKey, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import { boolean, datetime, foreignKey, mysqlEnum, mysqlTable, varchar } from 'drizzle-orm/mysql-core'
 
-export const Role = pgEnum('Role', ['USER', 'CHEF', 'ADMIN'])
-
-export const User = pgTable('User', {
-	id: text('id').notNull().primaryKey().default(sql`uuid()`),
-	email: text('email').notNull().unique(),
-	family_name: text('family_name').notNull(),
-	first_name: text('first_name').notNull(),
-	password: text('password').notNull(),
-	role: Role('role').notNull().default("USER"),
-	departmentId: text('departmentId'),
-	createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow(),
+export const User = mysqlTable('User', {
+	id: varchar('id', { length: 191 }).notNull().primaryKey().default(sql`uuid()`),
+	email: varchar('email', { length: 191 }).notNull().unique(),
+	family_name: varchar('family_name', { length: 191 }).notNull(),
+	first_name: varchar('first_name', { length: 191 }).notNull(),
+	password: varchar('password', { length: 191 }).notNull(),
+	role: mysqlEnum('role', ['USER', 'CHEF', 'ADMIN']).notNull().default("USER"),
+	departmentId: varchar('departmentId', { length: 191 }),
+	createdAt: datetime('createdAt', { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
 	validated: boolean('validated').notNull()
 });
 
-export const Post = pgTable('Post', {
-	id: text('id').notNull().primaryKey().default(sql`uuid()`),
-	content: text('content'),
-	authorId: text('authorId').notNull(),
-	image: text('image'),
-	createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow(),
+export const Post = mysqlTable('Post', {
+	id: varchar('id', { length: 191 }).notNull().primaryKey().default(sql`uuid()`),
+	content: varchar('content', { length: 191 }),
+	authorId: varchar('authorId', { length: 191 }).notNull(),
+	image: varchar('image', { length: 191 }),
+	createdAt: datetime('createdAt', { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
 	validated: boolean('validated').notNull(),
-	departmentId: text('departmentId').notNull(),
+	departmentId: varchar('departmentId', { length: 191 }).notNull(),
 	important: boolean('important').notNull()
 }, (Post) => ({
 	'Post_author_fkey': foreignKey({
@@ -41,11 +39,11 @@ export const Post = pgTable('Post', {
 		.onUpdate('cascade')
 }));
 
-export const Department = pgTable('Department', {
-	id: text('id').notNull().primaryKey().default(sql`uuid()`),
-	name: text('name').notNull(),
-	chefId: text('chefId').notNull(),
-	createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow()
+export const Department = mysqlTable('Department', {
+	id: varchar('id', { length: 191 }).notNull().primaryKey().default(sql`uuid()`),
+	name: varchar('name', { length: 191 }).notNull(),
+	chefId: varchar('chefId', { length: 191 }).notNull(),
+	createdAt: datetime('createdAt', { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`)
 }, (Department) => ({
 	'Department_chef_fkey': foreignKey({
 		name: 'Department_chef_fkey',
@@ -56,12 +54,12 @@ export const Department = pgTable('Department', {
 		.onUpdate('cascade')
 }));
 
-export const TVs = pgTable('TVs', {
-	id: text('id').notNull().primaryKey().default(sql`uuid()`),
-	name: text('name').notNull(),
-	departmentId: text('departmentId').notNull(),
-	password: text('password').notNull(),
-	createdAt: timestamp('createdAt', { precision: 3 }).notNull().defaultNow()
+export const TVs = mysqlTable('TVs', {
+	id: varchar('id', { length: 191 }).notNull().primaryKey().default(sql`uuid()`),
+	name: varchar('name', { length: 191 }).notNull(),
+	departmentId: varchar('departmentId', { length: 191 }).notNull(),
+	password: varchar('password', { length: 191 }).notNull(),
+	createdAt: datetime('createdAt', { fsp: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`)
 }, (TVs) => ({
 	'TVs_Department_fkey': foreignKey({
 		name: 'TVs_Department_fkey',
