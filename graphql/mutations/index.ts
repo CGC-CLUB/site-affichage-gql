@@ -50,7 +50,7 @@ export async function createUser({ input, req }: { input: CreateUserInput; req: 
     if (user.role === "USER") {
       return new GraphQLError("You can't create a user with this role");
     }
-    const newUser = await db.insert(User).values({
+    await db.insert(User).values({
       id,
       email: input.email,
       first_name: input.first_name,
@@ -59,14 +59,8 @@ export async function createUser({ input, req }: { input: CreateUserInput; req: 
       role: input.role,
       validated: false,
     });
-    return {
-      id: id,
-      first_name: input.family_name,
-      family_name: input.family_name,
-      email: input.email,
-      role: input.role,
-      validated: false,
-    };
+    const newUser = (await db.select().from(User).where(eq(User.id, id))).at(0);
+    return newUser;
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
@@ -77,6 +71,7 @@ export async function createUser({ input, req }: { input: CreateUserInput; req: 
 export async function createPost({ req, input }: { input: CreatePostInput; req: Request }) {
   try {
     const user = await useUser(req);
+    const id = uuid();
     if (!user) {
       return new GraphQLError("User not found");
     }
@@ -84,8 +79,8 @@ export async function createPost({ req, input }: { input: CreatePostInput; req: 
     const validated = user.role !== "USER";
     const important = user.role === "ADMIN";
 
-    const newPost = await db.insert(Post).values({
-      id: uuid(),
+    await db.insert(Post).values({
+      id,
       content: input.content,
       image: input.image,
       authorId: user.id,
@@ -93,7 +88,8 @@ export async function createPost({ req, input }: { input: CreatePostInput; req: 
       validated,
       important,
     });
-    return newPost.at(0);
+    const newPost = (await db.select().from(Post).where(eq(Post.id, id))).at(0);
+    return newPost;
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
@@ -111,16 +107,13 @@ export async function createDepartment({ input, req }: { input: CreateDepartment
     if (user.role !== "ADMIN") {
       return new GraphQLError("You can't create a department with this role");
     }
-    const newDepartment = await db.insert(Department).values({
+    await db.insert(Department).values({
       id,
       name: input.name,
       chefId: input.chef,
     });
-    return {
-      id,
-      chefId: input.chef,
-      name: input.name,
-    };
+    const newDepartment = (await db.select().from(Department).where(eq(Department.id, id))).at(0);
+    return newDepartment;
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
@@ -139,19 +132,15 @@ export async function createTV({ input, req }: { input: CreateTVInput; req: Requ
       return new GraphQLError("You can't create a TV with this role");
     }
 
-    const newTV = await db.insert(TVs).values({
+    await db.insert(TVs).values({
       id,
       name: input.name,
       password: input.password,
       departmentId: input.department,
     });
 
-    return {
-      id: id,
-      name: input.name,
-      password: input.password,
-      departmentId: input.department,
-    };
+    const newTV = (await db.select().from(TVs).where(eq(TVs.id, id))).at(0);
+    return newTV;
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
@@ -173,14 +162,7 @@ export async function validateUser({ input, req }: { input: ValidateUserInput; r
       return new GraphQLError("User not found");
     }
     const updatedUser = await db.update(User).set({ validated: true }).where(eq(User.id, input.id));
-    return {
-      id: input.id,
-      validated: true,
-      role: userToUpdate.at(0)!.role,
-      first_name: userToUpdate.at(0)!.first_name,
-      family_name: userToUpdate.at(0)!.family_name,
-      email: userToUpdate.at(0)!.email,
-    };
+    return { ...userToUpdate.at(0)!, validated: true };
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
@@ -208,16 +190,7 @@ export async function validatePost({ input, req }: { input: ValidatePostInput; r
     }
 
     const updatedPost = await db.update(Post).set({ validated: true }).where(eq(Post.id, input.id));
-    return {
-      id: input.id,
-      validated: true,
-      important: postToUpdate.important,
-      content: postToUpdate.content,
-      image: postToUpdate.image,
-      authorId: postToUpdate.authorId,
-      departmentId: postToUpdate.departmentId,
-      createdAt: postToUpdate.createdAt,
-    };
+    return { ...postToUpdate, validated: true };
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
