@@ -10,7 +10,7 @@ import type {
 } from "@/types";
 import jwt from "jsonwebtoken";
 import useUser from "@/utils/useUser";
-import { GraphQLError, validate } from "graphql";
+import { GraphQLError } from "graphql";
 import { Department, Post, TVs, User } from "@/prisma/drizzle/schema";
 import { db } from "@/prisma/db";
 import { and, eq } from "drizzle-orm";
@@ -107,6 +107,7 @@ export async function createDepartment({ input, req }: { input: CreateDepartment
     if (user.role !== "ADMIN") {
       return new GraphQLError("You can't create a department with this role");
     }
+    await db.update(User).set({ role: "CHEF" }).where(eq(User.id, user.id));
     await db.insert(Department).values({
       id,
       name: input.name,
@@ -244,7 +245,7 @@ export async function invalidatePost({ input, req }: { input: ValidatePostInput;
       return new GraphQLError("Post not found");
     }
     const updatedPost = await db.update(Post).set({ validated: false }).where(eq(Post.id, input.id));
-    return updatedPost.at(0);
+    return {...post,validated: false};
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
