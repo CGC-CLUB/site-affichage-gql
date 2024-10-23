@@ -49,20 +49,23 @@ export async function createUser({ input, req }: { input: CreateUserInput; req: 
     if (user.role === "USER") {
       return new GraphQLError("You can't create a user with this role");
     }
-    const newUser = await db
-      .insert(User)
-      .values({
-        id: uuid(),
-        email: input.email,
-        first_name: input.first_name,
-        family_name: input.family_name,
-        password: input.password,
-        role: input.role,
-        validated: false,
-      })
-      .returning();
+    const newUser = (
+      await db
+        .insert(User)
+        .values({
+          id: uuid(),
+          email: input.email,
+          first_name: input.first_name,
+          family_name: input.family_name,
+          password: input.password,
+          role: input.role,
+          validated: false,
+        })
+        .$returningId()
+    ).at(0);
+    const newUserQuery = (await db.select().from(User).where(eq(User.id, newUser?.id!))).at(0);
     console.log(newUser);
-    return newUser.at(0);
+    return newUserQuery;
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
@@ -80,18 +83,15 @@ export async function createPost({ req, input }: { input: CreatePostInput; req: 
     const validated = user.role !== "USER";
     const important = user.role === "ADMIN";
 
-    const newPost = await db
-      .insert(Post)
-      .values({
-        id: uuid(),
-        content: input.content,
-        image: input.image,
-        authorId: user.id,
-        departmentId: input.departmentId,
-        validated,
-        important,
-      })
-      .returning();
+    const newPost = await db.insert(Post).values({
+      id: uuid(),
+      content: input.content,
+      image: input.image,
+      authorId: user.id,
+      departmentId: input.departmentId,
+      validated,
+      important,
+    });
     return newPost.at(0);
   } catch (error) {
     console.log(error);
@@ -193,7 +193,7 @@ export async function validatePost({ input, req }: { input: ValidatePostInput; r
       return new GraphQLError("Post not found");
     }
 
-    const updatedPost = await db.update(Post).set({ validated: true }).where(eq(Post.id, input.id)).returning();
+    const updatedPost = await db.update(Post).set({ validated: true }).where(eq(Post.id, input.id));
     return updatedPost.at(0);
   } catch (error) {
     console.log(error);
@@ -247,7 +247,7 @@ export async function invalidatePost({ input, req }: { input: ValidatePostInput;
     if (!post) {
       return new GraphQLError("Post not found");
     }
-    const updatedPost = await db.update(Post).set({ validated: false }).where(eq(Post.id, input.id)).returning();
+    const updatedPost = await db.update(Post).set({ validated: false }).where(eq(Post.id, input.id));
     return updatedPost.at(0);
   } catch (error) {
     console.log(error);
