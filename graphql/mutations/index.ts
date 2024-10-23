@@ -10,7 +10,7 @@ import type {
 } from "@/types";
 import jwt from "jsonwebtoken";
 import useUser from "@/utils/useUser";
-import { GraphQLError } from "graphql";
+import { GraphQLError, validate } from "graphql";
 import { Department, Post, TVs, User } from "@/prisma/drizzle/schema";
 import { db } from "@/prisma/db";
 import { and, eq } from "drizzle-orm";
@@ -42,6 +42,7 @@ export async function login({ input, req }: { input: LoginInput; req: Request })
 export async function createUser({ input, req }: { input: CreateUserInput; req: Request }) {
   try {
     const user = await useUser(req);
+    const id = uuid();
     if (!user) {
       return new GraphQLError("User not found");
     }
@@ -49,23 +50,23 @@ export async function createUser({ input, req }: { input: CreateUserInput; req: 
     if (user.role === "USER") {
       return new GraphQLError("You can't create a user with this role");
     }
-    const newUser = (
-      await db
-        .insert(User)
-        .values({
-          id: uuid(),
-          email: input.email,
-          first_name: input.first_name,
-          family_name: input.family_name,
-          password: input.password,
-          role: input.role,
-          validated: false,
-        })
-        .$returningId()
-    ).at(0);
-    const newUserQuery = (await db.select().from(User).where(eq(User.id, newUser?.id!))).at(0);
-    console.log(newUser);
-    return newUserQuery;
+    const newUser = await db.insert(User).values({
+      id,
+      email: input.email,
+      first_name: input.first_name,
+      family_name: input.family_name,
+      password: input.password,
+      role: input.role,
+      validated: false,
+    });
+    return {
+      id: id,
+      first_name: input.family_name,
+      family_name: input.family_name,
+      email: input.email,
+      role: input.role,
+      validated: false,
+    };
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
@@ -103,21 +104,23 @@ export async function createPost({ req, input }: { input: CreatePostInput; req: 
 export async function createDepartment({ input, req }: { input: CreateDepartmentInput; req: Request }) {
   try {
     const user = await useUser(req);
+    const id = uuid();
     if (!user) {
       return new GraphQLError("User not found");
     }
     if (user.role !== "ADMIN") {
       return new GraphQLError("You can't create a department with this role");
     }
-    const newDepartment = await db
-      .insert(Department)
-      .values({
-        id: uuid(),
-        name: input.name,
-        chefId: input.chef,
-      })
-      .returning();
-    return newDepartment.at(0);
+    const newDepartment = await db.insert(Department).values({
+      id,
+      name: input.name,
+      chefId: input.chef,
+    });
+    return {
+      id,
+      chefId: input.chef,
+      name: input.name,
+    };
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
@@ -128,6 +131,7 @@ export async function createDepartment({ input, req }: { input: CreateDepartment
 export async function createTV({ input, req }: { input: CreateTVInput; req: Request }) {
   try {
     const user = await useUser(req);
+    const id = uuid();
     if (!user) {
       return new GraphQLError("User not found");
     }
@@ -135,16 +139,19 @@ export async function createTV({ input, req }: { input: CreateTVInput; req: Requ
       return new GraphQLError("You can't create a TV with this role");
     }
 
-    const newTV = await db
-      .insert(TVs)
-      .values({
-        id: uuid(),
-        name: input.name,
-        password: input.password,
-        departmentId: input.department,
-      })
-      .returning();
-    return newTV.at(0);
+    const newTV = await db.insert(TVs).values({
+      id,
+      name: input.name,
+      password: input.password,
+      departmentId: input.department,
+    });
+
+    return {
+      id: id,
+      name: input.name,
+      password: input.password,
+      departmentId: input.department,
+    };
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
@@ -165,8 +172,15 @@ export async function validateUser({ input, req }: { input: ValidateUserInput; r
     if (userToUpdate.length === 0) {
       return new GraphQLError("User not found");
     }
-    const updatedUser = await db.update(User).set({ validated: true }).where(eq(User.id, input.id)).returning();
-    return updatedUser.at(0);
+    const updatedUser = await db.update(User).set({ validated: true }).where(eq(User.id, input.id));
+    return {
+      id: input.id,
+      validated: true,
+      role: userToUpdate.at(0)!.role,
+      first_name: userToUpdate.at(0)!.first_name,
+      family_name: userToUpdate.at(0)!.family_name,
+      email: userToUpdate.at(0)!.email,
+    };
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
@@ -194,7 +208,16 @@ export async function validatePost({ input, req }: { input: ValidatePostInput; r
     }
 
     const updatedPost = await db.update(Post).set({ validated: true }).where(eq(Post.id, input.id));
-    return updatedPost.at(0);
+    return {
+      id: input.id,
+      validated: true,
+      important: postToUpdate.important,
+      content: postToUpdate.content,
+      image: postToUpdate.image,
+      authorId: postToUpdate.authorId,
+      departmentId: postToUpdate.departmentId,
+      createdAt: postToUpdate.createdAt,
+    };
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
@@ -269,8 +292,8 @@ export async function invalidateUser({ input, req }: { input: ValidateUserInput;
     if (userToUpdate.length === 0) {
       return new GraphQLError("User not found");
     }
-    const updatedUser = await db.update(User).set({ validated: false }).where(eq(User.id, input.id)).returning();
-    return updatedUser.at(0);
+    const updatedUser = await db.update(User).set({ validated: false }).where(eq(User.id, input.id));
+    return { ...userToUpdate.at(0)!, validated: false };
   } catch (error) {
     console.log(error);
     if (error instanceof Error) return new GraphQLError(error.message);
