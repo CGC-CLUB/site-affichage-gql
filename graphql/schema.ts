@@ -8,13 +8,14 @@ export const schema = /* GraphQL */ `
 
   type User {
     id: ID!
-    first_name: String
-    family_name: String
     email: String
+    family_name: String
+    first_name: String
     role: Role
+    password: String
     createdAt: DateTime
-    updatedAt: DateTime
     posts: [Post]
+    departmentId: ID
     department: Department
     validated: Boolean
   }
@@ -23,11 +24,12 @@ export const schema = /* GraphQL */ `
     id: ID!
     content: String
     author: User
+    authorId: ID
     image: String
     createdAt: DateTime
-    updatedAt: DateTime
     validated: Boolean
     department: Department
+    departmentId: ID
     important: Boolean
   }
 
@@ -35,17 +37,19 @@ export const schema = /* GraphQL */ `
     id: ID!
     name: String
     chef: User
+    chefId: ID
     TVs: [TV]
     posts: [Post]
     createdAt: DateTime
-    updatedAt: DateTime
   }
 
   type TV {
     id: ID!
     name: String
     department: Department
+    departmentId: ID
     password: String
+    createdAt: DateTime
   }
 
   type Query {
@@ -80,7 +84,7 @@ export const schema = /* GraphQL */ `
     content: String
     departmentId: ID
     authorId: ID
-    chefId:ID
+    chefId: ID
   }
 
   input UserFilterInput {

@@ -37,7 +37,7 @@ export function getUser(id: string) {
 export async function getPosts(filter?: PostFilterInput) {
   try {
     const filters: SQL[] = [];
-    const sevenDaysAgo = sql`NOW() - INTERVAL '7 days'`;
+    const sevenDaysAgo = sql`DATE_SUB(NOW(), INTERVAL 7 DAY)`;
     if (filter?.id) filters.push(eq(Post.id, filter.id));
     if (typeof filter?.validated === "boolean") filters.push(eq(Post.validated, filter.validated));
     if (filter?.content) filters.push(eq(Post.content, filter.content));

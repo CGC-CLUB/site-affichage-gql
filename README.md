@@ -21,7 +21,7 @@ bun install
 3. Create a `.env` file in the root directory and add the following variables:
 
 ```bash
-DATABASE_URL=mongodb+srv://<username>:<password>@<cluster-url>/<database-name>?retryWrites=true&w=majority
+DATABASE_URL=mysql://<user>:<password>@<host>:<port>/<database_name>
 JWT_SECRET=<your-secret-key>
 ```
 
