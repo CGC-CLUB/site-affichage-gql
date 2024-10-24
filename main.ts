@@ -4,13 +4,12 @@ import { useCookies } from "@whatwg-node/server-plugin-cookies";
 import * as resolvers from "@/graphql/resolvers";
 import * as mutations from "@/graphql/mutations";
 import { CreatePostInput, CreateUserInput, PostFilterInput, UserFilterInput } from "@/types";
-import { Department as DepartmentType, type Post as PostType, type User as UserType } from "@prisma/client";
 import { cors } from "@elysiajs/cors";
 import { schema } from "./graphql/schema";
-import prisma from "./utils/prisma";
 import { db } from "./prisma/db";
-import { Department, Post, TVs, User } from "./prisma/drizzle/schema";
+import { Department, Post, TVs, User, PostType, TVType, DepartmentType, UserType } from "./prisma/drizzle/schema";
 import { eq } from "drizzle-orm";
+import { GraphQLError } from "graphql";
 
 const app = new Elysia()
   .use(cors())
@@ -23,17 +22,17 @@ const app = new Elysia()
       useContext(_) {},
       resolvers: {
         Query: {
-          users: (_, args) => resolvers.getUsers(args?.filter as UserFilterInput),
-          user: (_, args) => resolvers.getUser(args.id),
-          posts: (_, args) => resolvers.getPosts(args?.filter as PostFilterInput),
-          post: (_, args) => resolvers.getPost(args.id),
-          departments: () => resolvers.getDepartments(),
-          department: (_, args) => resolvers.getDepartment(args.id),
-          TVs: () => resolvers.getTVs(),
-          TV: (_, args) => resolvers.getTV(args.id),
-          me: (_, _args, ctx) => {
+          users: async (_, args) => (await resolvers.getUsers(args?.filter as UserFilterInput)) as UserType[],
+          user: async (_, args) => (await resolvers.getUser(args.id)) as UserType | GraphQLError,
+          posts: async (_, args) => (await resolvers.getPosts(args?.filter as PostFilterInput)) as PostType[],
+          post: async (_, args) => (await resolvers.getPost(args.id)) as PostType | GraphQLError,
+          departments: async () => (await resolvers.getDepartments()) as DepartmentType[],
+          department: async (_, args) => (await resolvers.getDepartment(args.id)) as DepartmentType | GraphQLError,
+          TVs: async () => (await resolvers.getTVs()) as TVType[],
+          TV: async (_, args) => (await resolvers.getTV(args.id)) as TVType | GraphQLError,
+          me: async (_, _args, ctx) => {
             const req = ctx.request;
-            return resolvers.me(req) as Promise<UserType>;
+            return (await resolvers.me(req)) as UserType;
           },
         },
         Mutation: {
@@ -83,33 +82,28 @@ const app = new Elysia()
           },
         },
         Department: {
-          /*
-           * why i'm i getting this error:
-           * cuz the return type of the resolver is a promise + the type are not the same exactly (prisma got additional fields)
-           * so i'm just ignoring them
-           */
           // @ts-ignore
-          chef: async (parent) => (await db.select().from(User).where(eq(User.id, parent.chefId))).at(0),
+          chef: async (parent: DepartmentType) => (await db.select().from(User).where(eq(User.id, parent.chefId))).at(0),
           // @ts-ignore
-          TVs: async (parent) => await db.select().from(TVs).where(eq(TVs.departmentId, parent.id)),
+          TVs: async (parent: DepartmentType) => await db.select().from(TVs).where(eq(TVs.departmentId, parent.id)),
           // @ts-ignore
-          posts: async (parent) => await db.select().from(Post).where(eq(Post.departmentId, parent.id)),
+          posts: async (parent: DepartmentType) => await db.select().from(Post).where(eq(Post.departmentId, parent.id)),
         },
         User: {
           // @ts-ignore
-          posts: (parent) => db.select().from(Post).where(eq(Post.authorId, parent.id)),
+          posts: async (parent: UserType) => (await db.select().from(Post).where(eq(Post.authorId, parent.id))) as PostType[],
           // @ts-ignore
-          department: async (parent) => (await db.select().from(Department).where(eq(Department.id, parent.departmentId))).at(0),
+          department: async (parent: UserType) => (await db.select().from(Department).where(eq(Department.id, parent.departmentId))).at(0),
         },
         Post: {
           // @ts-ignore
-          author: async (parent) => (await db.select().from(User).where(eq(User.id, parent.authorId))).at(0),
+          author: async (parent: PostType) => (await db.select().from(User).where(eq(User.id, parent.authorId))).at(0),
           // @ts-ignore
-          department: async (parent) => (await db.select().from(Department).where(eq(Department.id, parent.departmentId))).at(0),
+          department: async (parent: PostType) => (await db.select().from(Department).where(eq(Department.id, parent.departmentId))).at(0),
         },
         TV: {
           // @ts-ignore
-          department: async (parent) => (await db.select().from(Department).where(eq(Department.id, parent.departmentId))).at(0),
+          department: async (parent: PostType) => (await db.select().from(Department).where(eq(Department.id, parent.departmentId))).at(0),
         },
       },
       plugins: [useCookies()],
