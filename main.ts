@@ -112,4 +112,4 @@ const app = new Elysia()
 
   .listen(3000);
 
-console.log("🎉 Listening on http://localhost:3000");
+console.log("🎉 GraphQL server runs on http://localhost:3000/graphql");
