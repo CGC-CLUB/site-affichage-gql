@@ -13,7 +13,6 @@ export const schema = /* GraphQL */ `
     email: String
     role: Role
     createdAt: DateTime
-    updatedAt: DateTime
     posts: [Post]
     department: Department
     validated: Boolean
@@ -25,7 +24,6 @@ export const schema = /* GraphQL */ `
     author: User
     image: String
     createdAt: DateTime
-    updatedAt: DateTime
     validated: Boolean
     department: Department
     important: Boolean
@@ -38,7 +36,6 @@ export const schema = /* GraphQL */ `
     TVs: [TV]
     posts: [Post]
     createdAt: DateTime
-    updatedAt: DateTime
   }
 
   type TV {
@@ -80,7 +77,7 @@ export const schema = /* GraphQL */ `
     content: String
     departmentId: ID
     authorId: ID
-    chefId:ID
+    chefId: ID
   }
 
   input UserFilterInput {

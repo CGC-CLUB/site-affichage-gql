@@ -4,10 +4,13 @@ import { useCookies } from "@whatwg-node/server-plugin-cookies";
 import * as resolvers from "@/graphql/resolvers";
 import * as mutations from "@/graphql/mutations";
 import { CreatePostInput, CreateUserInput, PostFilterInput, UserFilterInput } from "@/types";
-import { Department, Post, User } from "@prisma/client";
+import { Department as DepartmentType, type Post as PostType, type User as UserType } from "@prisma/client";
 import { cors } from "@elysiajs/cors";
 import { schema } from "./graphql/schema";
 import prisma from "./utils/prisma";
+import { db } from "./prisma/db";
+import { Department, Post, TVs, User } from "./prisma/drizzle/schema";
+import { eq } from "drizzle-orm";
 
 const app = new Elysia()
   .use(cors())
@@ -30,21 +33,21 @@ const app = new Elysia()
           TV: (_, args) => resolvers.getTV(args.id),
           me: (_, _args, ctx) => {
             const req = ctx.request;
-            return resolvers.me(req) as Promise<User>;
+            return resolvers.me(req) as Promise<UserType>;
           },
         },
         Mutation: {
           login: (_, args, ctx) => {
             const req = ctx.request;
-            return mutations.login({ input: args.input, req }) as Promise<User>;
+            return mutations.login({ input: args.input, req }) as Promise<UserType>;
           },
           createUser: (_, args, ctx) => {
             const req = ctx.request;
-            return mutations.createUser({ input: args.input as CreateUserInput, req }) as Promise<User>;
+            return mutations.createUser({ input: args.input as CreateUserInput, req }) as Promise<UserType>;
           },
           createDepartment: (_, args, ctx) => {
             const req = ctx.request;
-            return mutations.createDepartment({ input: args.input, req }) as Promise<Department>;
+            return mutations.createDepartment({ input: args.input, req }) as Promise<DepartmentType>;
           },
           createTV: (_, args, ctx) => {
             const req = ctx.request;
@@ -52,15 +55,15 @@ const app = new Elysia()
           },
           createPost: (_, args, ctx) => {
             const req = ctx.request;
-            return mutations.createPost({ input: args.input as CreatePostInput, req }) as Promise<Post>;
+            return mutations.createPost({ input: args.input as CreatePostInput, req }) as Promise<PostType>;
           },
           validateUser: (_, args, ctx) => {
             const req = ctx.request;
-            return mutations.validateUser({ input: args.input, req }) as Promise<User>;
+            return mutations.validateUser({ input: args.input, req }) as Promise<UserType>;
           },
           validatePost: (_, args, ctx) => {
             const req = ctx.request;
-            return mutations.validatePost({ input: args.input, req }) as Promise<Post>;
+            return mutations.validatePost({ input: args.input, req }) as Promise<PostType>;
           },
           loginTv(_parent, args, ctx) {
             const req = ctx.request;
@@ -68,11 +71,11 @@ const app = new Elysia()
           },
           invalidatePost: (_, args, ctx) => {
             const req = ctx.request;
-            return mutations.invalidatePost({ input: args.input, req }) as Promise<Post>;
+            return mutations.invalidatePost({ input: args.input, req }) as Promise<PostType>;
           },
           invalidateUser: (_, args, ctx) => {
             const req = ctx.request;
-            return mutations.invalidateUser({ input: args.input, req }) as Promise<User>;
+            return mutations.invalidateUser({ input: args.input, req }) as Promise<UserType>;
           },
           logout: (_, _args, ctx) => {
             const req = ctx.request;
@@ -86,27 +89,27 @@ const app = new Elysia()
            * so i'm just ignoring them
            */
           // @ts-ignore
-          chef: (parent) => prisma.user.findUnique({ where: { id: parent.chefId } }),
+          chef: async (parent) => (await db.select().from(User).where(eq(User.id, parent.chefId))).at(0),
           // @ts-ignore
-          TVs: (parent) => prisma.tVs.findMany({ where: { departmentId: parent.id } }),
+          TVs: async (parent) => await db.select().from(TVs).where(eq(TVs.departmentId, parent.id)),
           // @ts-ignore
-          posts: (parent) => prisma.post.findMany({ where: { departmentId: parent.id } }),
+          posts: async (parent) => await db.select().from(Post).where(eq(Post.departmentId, parent.id)),
         },
         User: {
           // @ts-ignore
-          posts: (parent) => prisma.post.findMany({ where: { authorId: parent.id } }),
+          posts: (parent) => db.select().from(Post).where(eq(Post.authorId, parent.id)),
           // @ts-ignore
-          department: (parent) => prisma.department.findUnique({ where: { id: parent.departmentId } }),
+          department: async (parent) => (await db.select().from(Department).where(eq(Department.id, parent.departmentId))).at(0),
         },
         Post: {
           // @ts-ignore
-          author: (parent) => prisma.user.findUnique({ where: { id: parent.authorId } }),
+          author: async (parent) => (await db.select().from(User).where(eq(User.id, parent.authorId))).at(0),
           // @ts-ignore
-          department: (parent) => prisma.department.findUnique({ where: { id: parent.departmentId } }),
+          department: async (parent) => (await db.select().from(Department).where(eq(Department.id, parent.departmentId))).at(0),
         },
         TV: {
           // @ts-ignore
-          department: (parent) => prisma.department.findUnique({ where: { id: parent.departmentId } }),
+          department: async (parent) => (await db.select().from(Department).where(eq(Department.id, parent.departmentId))).at(0),
         },
       },
       plugins: [useCookies()],
