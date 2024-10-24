@@ -7,7 +7,7 @@
 ### Prerequisites
 
 - Bun.js 1.1.x
-- MongoDB
+- MySQL
 
 ### Installation
 
